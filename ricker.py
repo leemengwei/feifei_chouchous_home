@@ -1,23 +1,31 @@
+
+
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-#matrix = np.loadtxt(open("ricker.xz","r"),delimiter="\n")
-#t=matrix[:,1]
-#ricker=matrix[:,2]
-
-f = open('ricker.xz','r')
-matrix = f.readlines()
-for line in matrix:
-   row = line.split('\n')
-   temp = row.split('\t')
-   dateset.append(temp)
-for i in range
-   print(ma_float)
-f.close()
 
 
-plt.figure()
-#plt.plot(t,ricker)
-plt.show()
+def get_data(filename):
+    data = np.loadtxt(filename)
+    return data
 
+
+if __name__ == "__main__":
+    #Configs:
+    filename = "./ricker.xyz"
+
+    #Get data:
+    data = get_data(filename)
+
+    #Plot:
+    plt.plot(data[:,0], data[:,1])  #画线
+    plt.scatter(data[:,0], data[:,1], color='red', alpha=0.5, s=10)   #画点(颜色，透明度，点的大小)
+    
+    plt.xlabel("Time")
+    plt.ylabel("Amptitude")
+    plt.title("Source point")
+    plt.show()
+    
