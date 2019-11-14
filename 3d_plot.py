@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 #from mayavi import mlab
 
-def get_filttered_position_and_speed(raw_data, sample_num):
-    sample_index = np.random.choice(range(len(raw_data)), sample_num)
+def get_filttered_position_and_speed(raw_data, sample_ratio):
+    #sample_index = np.random.choice(range(len(raw_data)), sample_num)
+    sample_index = np.where(raw_data[:,3:].sum(axis=1)!=0)[0][::sample_ratio]
     sampled_data = raw_data[sample_index]
     shaped_data = raw_data.reshape(391,391,160,6)
 
-    data_no_xyz = data[:,:,:,3:]
     x = sampled_data[:,0]
     y = sampled_data[:,1]
     z = sampled_data[:,2]
@@ -33,18 +33,19 @@ if __name__ == "__main__":
     raw_data = np.loadtxt("out01_gre")
 
     #Re-arrange data:
-    sample_num = 15000
-    x, y, z, u, v, w = get_filttered_position_and_speed(raw_data, sample_num)
+    sample_ratio = 100
+    x, y, z, u, v, w = get_filttered_position_and_speed(raw_data, sample_ratio)
 
+    embed()
     #Plot:
     plt.figure(figsize=(18,6))
     ax_1 = plt.subplot(131, projection='3d')
     ax_2 = plt.subplot(132, projection='3d')
     ax_3 = plt.subplot(133, projection='3d')
 
-    ax_1.scatter(x, y, z, c=u, cmap='viridis', s=NormalizeData(np.abs(u))+1)
-    ax_2.scatter(x, y, z, c=v, cmap='viridis', s=NormalizeData(np.abs(v))+1)
-    ax_3.scatter(x, y, z, c=w, cmap='viridis', s=NormalizeData(np.abs(w))+1)
+    ax_1.scatter(x, y, z, c=NormalizeData(np.abs(u))+1, cmap='viridis', s=NormalizeData(np.abs(u))+1)
+    ax_2.scatter(x, y, z, c=NormalizeData(np.abs(v))+1, cmap='viridis', s=NormalizeData(np.abs(v))+1)
+    ax_3.scatter(x, y, z, c=NormalizeData(np.abs(w))+1, cmap='viridis', s=NormalizeData(np.abs(w))+1)
 
     ax_1.set_title("U")
     ax_2.set_title("V")
