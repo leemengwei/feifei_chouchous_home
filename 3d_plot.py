@@ -1,10 +1,8 @@
 import numpy as np
 import matplotlib
-#matplotlib.use('TkAgg')   #WX, QTAgg, QT4Agg
 from IPython import embed
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-#from mayavi import mlab
 
 def get_filttered_position_and_speed(raw_data, sample_ratio):
     #sample_index = np.random.choice(range(len(raw_data)), sample_num)
@@ -27,16 +25,16 @@ def NormalizeData(data):
     return 10*(data - np.min(data)) / (np.max(data) - np.min(data) + 1e-100)
 
 if __name__ == "__main__":
-    print("Reading...")
     
     #Get data:
+    print("Reading...")
     raw_data = np.loadtxt("out01_gre")
 
     #Re-arrange data:
+    print("Preprocessing...")
     sample_ratio = 100
     x, y, z, u, v, w = get_filttered_position_and_speed(raw_data, sample_ratio)
 
-    embed()
     #Plot:
     plt.figure(figsize=(18,6))
     ax_1 = plt.subplot(131, projection='3d')
@@ -61,6 +59,6 @@ if __name__ == "__main__":
     ax_3.set_ylabel("Y")
     ax_3.set_zlabel("Z")
 
-
+    plt.show()
 
 
