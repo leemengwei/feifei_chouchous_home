@@ -3,6 +3,7 @@ import matplotlib
 from IPython import embed
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import glob
 
 def get_filttered_position_and_speed(raw_data, sample_ratio):
     if only_moves:
@@ -24,7 +25,25 @@ def get_filttered_position_and_speed(raw_data, sample_ratio):
     return x,y,z,u,v,w
 
 def NormalizeData(data):
-    return 10*(data - np.min(data)) / (np.max(data) - np.min(data) + 1e-100)
+    return np.exp(5*(data - np.min(data)) / (np.max(data) - np.min(data) + 1e-100))
+
+def get_max_min_over_all_files(all_files):
+    print("Getting min and max...")
+    min_value_u=1e9
+    max_value_u=-1e9
+    min_value_v=1e9
+    max_value_v=-1e9
+    min_value_w=1e9
+    max_value_w=-1e9
+    for one_file in all_files:
+        raw_data = np.loadtxt("%s"%one_file)
+        min_value_u = min(min_value_u, raw_data[:,3].min())
+        max_value_u = max(max_value_u, raw_data[:,3].max())
+        min_value_v = min(min_value_w, raw_data[:,4].min())
+        max_value_v = max(max_value_w, raw_data[:,4].max())
+        min_value_w = min(min_value_v, raw_data[:,5].min())
+        max_value_w = max(max_value_v, raw_data[:,5].max())
+    return min_value_u, max_value_u, min_value_v, max_value_v, min_value_w, max_value_w
 
 if __name__ == "__main__":
     #load_raw = False
@@ -34,11 +53,15 @@ if __name__ == "__main__":
     vis_plot = False
     #vis_plot = True
     #Get data:
-    
-    for i in range(1,27):
+    all_files = glob.glob("./result_out/*")
+    all_files.sort()
+    min_u, max_u, min_v, max_v, min_w, max_w = get_max_min_over_all_files(all_files)
+    print("MinMaxValue over files of u,v,w:", min_u, max_u, min_v, max_v, min_w, max_w)  
+  
+    for one_file in all_files:
         if load_raw:
-            print("Reading...%s"%i)
-            raw_data = np.loadtxt("./result_out/out%s"%i)
+            print("Reading...%s"%one_file)
+            raw_data = np.loadtxt("%s"%one_file)
         
             #Re-arrange data:
             print("Preprocessing...")
@@ -68,10 +91,10 @@ if __name__ == "__main__":
             ax_1 = plt.subplot(131, projection='3d')
             ax_2 = plt.subplot(132, projection='3d')
             ax_3 = plt.subplot(133, projection='3d')
-        
-            ax_1.scatter(x, y, z, c=NormalizeData(np.abs(u))+1, cmap='viridis', s=NormalizeData(np.abs(u))+1)
-            ax_2.scatter(x, y, z, c=NormalizeData(np.abs(v))+1, cmap='viridis', s=NormalizeData(np.abs(v))+1)
-            ax_3.scatter(x, y, z, c=NormalizeData(np.abs(w))+1, cmap='viridis', s=NormalizeData(np.abs(w))+1)
+            #embed()
+            ax_1.scatter(x, y, z, c=u, cmap='Paired', s=NormalizeData(np.abs(u))+1, vmin=min_u, vmax=max_u)
+            ax_2.scatter(x, y, z, c=v, cmap='Paired', s=NormalizeData(np.abs(v))+1, vmin=min_v, vmax=max_v)
+            ax_3.scatter(x, y, z, c=w, cmap='Paired', s=NormalizeData(np.abs(w))+1, vmin=min_w, vmax=max_w)
         
             ax_1.set_title("U")
             ax_2.set_title("V")
@@ -86,9 +109,10 @@ if __name__ == "__main__":
             ax_3.set_xlabel("X")
             ax_3.set_ylabel("Y")
             ax_3.set_zlabel("Z")
-            
-            plt.title("On time: %s"%i)
-            plt.savefig("%s"%str(i).zfill(3))
+       
+            #plt.colorbar()     
+            plt.title("On file: %s"%one_file)
+            plt.savefig("%s"%one_file.split('/')[-1])
             #plt.show()
             plt.close() 
         
