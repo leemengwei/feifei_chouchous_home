@@ -24,4 +24,4 @@ if __name__ == "__main__":
     data = read_binary_data(filename, size_of_one_number)
 
                                                                                                                   
-
+    embed()
