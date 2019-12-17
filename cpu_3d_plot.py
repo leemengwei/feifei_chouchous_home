@@ -44,13 +44,19 @@ def get_max_min_over_all_files(all_files):
     return min_value_u, max_value_u, min_value_v, max_value_v, min_value_w, max_value_w
 
 if __name__ == "__main__":
+    #Configurations:
     import config as CONFIG
+
     #Get data:
     all_files = glob.glob("./result_out/*")
     all_files.sort()
+    #Search min and max:
     min_u, max_u, min_v, max_v, min_w, max_w = get_max_min_over_all_files(all_files)
     print("MinMaxValue over files of u,v,w:", min_u, max_u, min_v, max_v, min_w, max_w)  
-  
+    min_all = min(min_u, min_v, min_w)
+    max_all = min(max_u, max_v, max_w)
+
+    #Plot:
     for one_file in all_files:
         print("Reading...%s"%one_file)
         raw_data = np.loadtxt("%s"%one_file)
@@ -65,11 +71,15 @@ if __name__ == "__main__":
         ax_1 = plt.subplot(131, projection='3d')
         ax_2 = plt.subplot(132, projection='3d')
         ax_3 = plt.subplot(133, projection='3d')
-        
-        ax_1.scatter(x, y, z, c=u, cmap='Paired', s=NormalizeData(np.abs(u))+1, vmin=min_u, vmax=max_u)
-        ax_2.scatter(x, y, z, c=v, cmap='Paired', s=NormalizeData(np.abs(v))+1, vmin=min_v, vmax=max_v)
-        ax_3.scatter(x, y, z, c=w, cmap='Paired', s=NormalizeData(np.abs(w))+1, vmin=min_w, vmax=max_w)
-       
+
+        ax_1.scatter(x, y, z, c=u, cmap=CONFIG.COLOR_STYLE, s=NormalizeData(np.abs(u))+1, vmin=min_all, vmax=max_all)
+        ax_2.scatter(x, y, z, c=v, cmap=CONFIG.COLOR_STYLE, s=NormalizeData(np.abs(v))+1, vmin=min_all, vmax=max_all)
+        ax_3.scatter(x, y, z, c=w, cmap=CONFIG.COLOR_STYLE, s=NormalizeData(np.abs(w))+1, vmin=min_all, vmax=max_all)
+        m = matplotlib.cm.ScalarMappable(cmap=eval("matplotlib.cm.%s"%CONFIG.COLOR_STYLE))
+        #m.set_array(np.linspace(min_all, max_all, 10000))
+        m.set_array(np.linspace(min_all, max_all, 100))
+        plt.colorbar(m)
+
         ax_1.set_title("U")
         ax_2.set_title("V")
         ax_3.set_title("W")
@@ -85,19 +95,33 @@ if __name__ == "__main__":
         ax_3.set_zlabel("Z")
       
         #embed() 
-        #plt.colorbar()     
+        #plt.colorbar()
         plt.title("On file: %s"%one_file)
         plt.savefig("./pngs/%s"%one_file.split('/')[-1])
         #plt.show()
         plt.close() 
 
     #Use GPU render:
+    #position = np.vstack((x,y,z)).T
+    #colors = plt.cm.jet(np.linspace(1,0,len(position)))
     #try:
     #    import vispy
     #    import plot_utils
     #    from vispy import app, visuals, scene
     #    plot_utils.GPU_3d_scatter_plot(pos, colors)
     #    app.run()
+    #except Exception as e:
+    #    print("Perhaps vispy not installed, pass.", e)
+
+    #Run a bash command to generate gif and show it
+    if CONFIG.GIF_GENERATION:
+        print("Generating gif under ./pngs/")
+        os.system("convert -delay 0 pngs/*.png -loop 0 pngs/output.gif")
+        os.system("eog pngs/output.gif")
+
+    print("Thank you feifei")
+
+
     #except Exception as e:
     #    print("Perhaps vispy not installed, pass.", e)
 
@@ -109,9 +133,3 @@ if __name__ == "__main__":
         os.system("eog pngs/output.gif")
 
     print("Thank you feifei")
-
-
-
-
-
-
