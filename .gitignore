@@ -1,3 +1,7 @@
 __pycache__
 out01_gre
 *.png
+*.gif
+*.tar
+*.pyc
+*.swp
