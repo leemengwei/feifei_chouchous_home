@@ -122,15 +122,3 @@ if __name__ == "__main__":
 
     print("Thank you feifei")
 
-
-    #except Exception as e:
-    #    print("Perhaps vispy not installed, pass.", e)
-
-
-    #Run a bash command to generate gif and show it
-    if CONFIG.GIF_GENERATION:
-        print("Generating gif under ./pngs/")
-        os.system("convert -delay 0 pngs/*.png -loop 0 pngs/output.gif")
-        os.system("eog pngs/output.gif")
-
-    print("Thank you feifei")
