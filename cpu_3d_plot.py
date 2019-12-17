@@ -55,6 +55,7 @@ if __name__ == "__main__":
     print("MinMaxValue over files of u,v,w:", min_u, max_u, min_v, max_v, min_w, max_w)  
     min_all = min(min_u, min_v, min_w)
     max_all = min(max_u, max_v, max_w)
+    _ = (max_all-min_all)*0.2
 
     #Plot:
     for one_file in all_files:
@@ -77,7 +78,7 @@ if __name__ == "__main__":
         ax_3.scatter(x, y, z, c=w, cmap=CONFIG.COLOR_STYLE, s=NormalizeData(np.abs(w))+1, vmin=min_all, vmax=max_all)
         m = matplotlib.cm.ScalarMappable(cmap=eval("matplotlib.cm.%s"%CONFIG.COLOR_STYLE))
         #m.set_array(np.linspace(min_all, max_all, 10000))
-        m.set_array(np.linspace(min_all, max_all, 100))
+        m.set_array(np.linspace(min_all-_, max_all+_, 100))
         plt.colorbar(m)
 
         ax_1.set_title("U")
