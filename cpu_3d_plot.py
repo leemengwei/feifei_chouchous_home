@@ -107,6 +107,7 @@ if __name__ == "__main__":
         plt.savefig("./pngs/%s_ZOOM%s"%(one_file.split('/')[-1], CONFIG.ZOOMER))
         #plt.show()
         plt.close() 
+        fig.clf()
 
     #Use GPU render:
     #position = np.vstack((x,y,z)).T
