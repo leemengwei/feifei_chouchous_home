@@ -23,7 +23,7 @@ def filtter_and_reshape_data(raw_data, CONFIG):
     return x,y,z,u,v,w
 
 def NormalizeData(data):
-    return np.exp(2*(data - np.min(data)) / (np.max(data) - np.min(data) + 1e-100))
+    return np.exp(4*(data - np.min(data)) / (np.max(data) - np.min(data) + 1e-20))
 
 def get_max_min_over_all_files(all_files):
     print("Getting min and max...")
@@ -58,29 +58,38 @@ if __name__ == "__main__":
     _ = (max_all-min_all)*0.2
 
     #Plot:
-    for one_file in all_files:
+    for t,one_file in enumerate(all_files):
         print("Reading...%s"%one_file)
         raw_data = np.loadtxt("%s"%one_file)
         #Re-arrange data:
         print("Preprocessing...")
         x, y, z, u, v, w = filtter_and_reshape_data(raw_data, CONFIG)
-        position = np.vstack((x,y,z)).T
-        colors = plt.cm.jet(np.linspace(1,0,len(position)))
         
         #Plot:
-        plt.figure(figsize=(18,6))
+        fig = plt.figure(figsize=(18,6))
+        fig.suptitle("On time %s with zoomer %s"%(t,CONFIG.ZOOMER))
         ax_1 = plt.subplot(131, projection='3d')
         ax_2 = plt.subplot(132, projection='3d')
         ax_3 = plt.subplot(133, projection='3d')
 
-        ax_1.scatter(x, y, z, c=u, cmap=CONFIG.COLOR_STYLE, s=NormalizeData(np.abs(u))+1, vmin=min_all, vmax=max_all)
-        ax_2.scatter(x, y, z, c=v, cmap=CONFIG.COLOR_STYLE, s=NormalizeData(np.abs(v))+1, vmin=min_all, vmax=max_all)
-        ax_3.scatter(x, y, z, c=w, cmap=CONFIG.COLOR_STYLE, s=NormalizeData(np.abs(w))+1, vmin=min_all, vmax=max_all)
-        m = matplotlib.cm.ScalarMappable(cmap=eval("matplotlib.cm.%s"%CONFIG.COLOR_STYLE))
-        #m.set_array(np.linspace(min_all, max_all, 10000))
-        m.set_array(np.linspace(min_all-_, max_all+_, 100))
-        plt.colorbar(m)
-
+        #CONFIG.COLOR_STYLE = plt.cm.jet(np.linspace(0, 1, len(x)))
+        norm_u = CONFIG.ZOOMER*u/max(abs(min_u),abs(max_u))
+        norm_v = CONFIG.ZOOMER*v/max(abs(min_v),abs(max_v))
+        norm_w = CONFIG.ZOOMER*w/max(abs(min_w),abs(max_w))
+        ax_1.scatter(x, y, z, c=norm_u, cmap=CONFIG.COLOR_STYLE, s=NormalizeData(np.abs(u))+1, vmin=-1, vmax=1)
+        ax_2.scatter(x, y, z, c=norm_v, cmap=CONFIG.COLOR_STYLE, s=NormalizeData(np.abs(v))+1, vmin=-1, vmax=1)
+        ax_3.scatter(x, y, z, c=norm_w, cmap=CONFIG.COLOR_STYLE, s=NormalizeData(np.abs(w))+1, vmin=-1, vmax=1)
+        #Colorbars:
+        m1 = matplotlib.cm.ScalarMappable(cmap=eval("matplotlib.cm.%s"%CONFIG.COLOR_STYLE))
+        m2 = matplotlib.cm.ScalarMappable(cmap=eval("matplotlib.cm.%s"%CONFIG.COLOR_STYLE))
+        m3 = matplotlib.cm.ScalarMappable(cmap=eval("matplotlib.cm.%s"%CONFIG.COLOR_STYLE))
+        m1.set_array(np.linspace(min_u, max_u, 100))
+        m2.set_array(np.linspace(min_v, max_v, 100))
+        m3.set_array(np.linspace(min_w, max_w, 100))
+        plt.colorbar(m1, ax=ax_1, orientation='horizontal')
+        plt.colorbar(m2, ax=ax_2, orientation='horizontal')
+        plt.colorbar(m3, ax=ax_3, orientation='horizontal')
+        
         ax_1.set_title("U")
         ax_2.set_title("V")
         ax_3.set_title("W")
@@ -94,11 +103,8 @@ if __name__ == "__main__":
         ax_3.set_xlabel("X")
         ax_3.set_ylabel("Y")
         ax_3.set_zlabel("Z")
-      
-        #embed() 
-        #plt.colorbar()
-        plt.title("On file: %s"%one_file)
-        plt.savefig("./pngs/%s"%one_file.split('/')[-1])
+
+        plt.savefig("./pngs/%s_ZOOM%s"%(one_file.split('/')[-1], CONFIG.ZOOMER))
         #plt.show()
         plt.close() 
 
@@ -117,8 +123,8 @@ if __name__ == "__main__":
     #Run a bash command to generate gif and show it
     if CONFIG.GIF_GENERATION:
         print("Generating gif under ./pngs/")
-        os.system("convert -delay 0 pngs/*.png -loop 0 pngs/output.gif")
-        os.system("eog pngs/output.gif")
+        os.system("convert -delay 0 pngs/*_ZOOM%s.png -loop 0 pngs/output_ZOOM%s.gif"%(CONFIG.ZOOMER, CONFIG.ZOOMER))
+        os.system("eog pngs/output_ZOOM%s.gif"%CONFIG.ZOOMER)
 
     print("Thank you feifei")
 

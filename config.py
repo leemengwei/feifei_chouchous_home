@@ -9,4 +9,6 @@ MODEL_SHAPE = [31,31,25]  #Your model shape
 
 GIF_GENERATION = True   #Automatically generate GIF
 
-COLOR_STYLE = 'ocean'
+COLOR_STYLE = 'seismic'    #Keep this one
+
+ZOOMER = 10000    #The bigger this zoomer is, the more vivid you'll see wave transportation. 1 means keep everything raw.
