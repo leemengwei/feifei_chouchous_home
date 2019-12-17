@@ -8,3 +8,5 @@ SAMPLE_RATIO = 1  #More points will be shown
 MODEL_SHAPE = [31,31,25]  #Your model shape
 
 GIF_GENERATION = True   #Automatically generate GIF
+
+COLOR_STYLE = 'summer'
